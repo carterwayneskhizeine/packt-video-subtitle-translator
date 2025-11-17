@@ -1,8 +1,8 @@
 {
   "manifest_version": 3,
-  "name": "Packt 视频字幕实时同步器",
+  "name": "Packt Video Subtitle Real-time Synchronizer",
   "version": "1.1.0",
-  "description": "将 Packt 字幕区域的翻译实时同步到视频字幕显示区域（需配合沉浸式翻译插件使用）",
+  "description": "Synchronize the translation of Packt subtitle area in real-time to the video subtitle display area (requires the use of the Immersive Translation extension).",
   "permissions": [
     "storage",
     "activeTab"
