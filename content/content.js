@@ -69,9 +69,19 @@
 
     console.log('📺 开始监听视频字幕变化...');
 
+    let updateTimer = null; // 防抖定时器
+
     // 监听字幕文本变化
     const captionObserver = new MutationObserver(() => {
-      findAndDisplayCurrentSubtitle();
+      // 防抖处理：清除之前的定时器
+      if (updateTimer) {
+        clearTimeout(updateTimer);
+      }
+
+      // 使用防抖，避免频繁更新
+      updateTimer = setTimeout(() => {
+        findAndDisplayCurrentSubtitle();
+      }, 50);
     });
 
     captionObserver.observe(captionText, {
@@ -91,10 +101,26 @@
 
     console.log('📜 开始监听字幕翻译区域变化...');
 
+    let transcriptUpdateTimer = null; // 防抖定时器
+    let lastTranscriptUpdate = 0; // 上次更新时间
+
     // 监听沉浸式翻译插件生成的 font 元素变化
     transcriptObserver = new MutationObserver(() => {
-      // 字幕文本有更新时重新查找当前字幕
-      findAndDisplayCurrentSubtitle();
+      // 限流：如果上次更新在300ms内，跳过本次
+      const now = Date.now();
+      if (now - lastTranscriptUpdate < 300) {
+        return;
+      }
+
+      // 使用防抖，避免频繁更新
+      if (transcriptUpdateTimer) {
+        clearTimeout(transcriptUpdateTimer);
+      }
+
+      transcriptUpdateTimer = setTimeout(() => {
+        lastTranscriptUpdate = Date.now();
+        findAndDisplayCurrentSubtitle();
+      }, 200);
     });
 
     transcriptObserver.observe(transcriptBody, {
@@ -114,21 +140,23 @@
 
     // 获取视频当前显示的英文字幕
     const currentEnglishText = captionText.textContent.trim();
-    if (!currentEnglishText) return;
 
-    // 查找沉浸式翻译生成的翻译内容
-    // 结构: <div class="reader-video-transripts-body">
-    //   <span data-start="6" data-end="7">Welcome to this lecture.</span>
-    //   ...更多英文 span...
-    //   <font class="notranslate immersive-translate-target-wrapper">
-    //     <font>
-    //       <font>
-    //         <span data-start="6" data-end="7">欢迎来到本次讲座。</span>
-    //         ...更多中文 span...
-    //       </font>
-    //     </font>
-    //   </font>
-    // </div>
+    if (!currentEnglishText) {
+      // 如果字幕为空，隐藏翻译字幕
+      const translatedSubtitle = document.querySelector('.packt-translated-subtitle');
+      if (translatedSubtitle) {
+        translatedSubtitle.style.display = 'none';
+      }
+      return;
+    }
+
+    // 正常映射逻辑
+    return mapSubtitleToTranslation(currentEnglishText, transcriptBody);
+  }
+
+  // 字幕映射的核心逻辑
+  function mapSubtitleToTranslation(englishText, transcriptBody) {
+    console.log('🔍 开始映射字幕:', englishText);
 
     // 步骤1: 在原始英文 span 中查找匹配当前字幕的元素
     const englishSpans = transcriptBody.querySelectorAll(':scope > span[data-start]');
@@ -136,10 +164,11 @@
     let matchedDataStart = null;
 
     for (let i = 0; i < englishSpans.length; i++) {
-      const englishText = englishSpans[i].textContent.trim();
-      if (englishText === currentEnglishText) {
+      const spanText = englishSpans[i].textContent.trim();
+      if (spanText === englishText) {
         matchedIndex = i;
         matchedDataStart = englishSpans[i].getAttribute('data-start');
+        console.log('✅ 完全匹配:', spanText, 'index:', i, 'data-start:', matchedDataStart);
         break;
       }
     }
@@ -147,37 +176,41 @@
     if (matchedIndex === -1) {
       // 没有完全匹配，尝试部分匹配
       for (let i = 0; i < englishSpans.length; i++) {
-        const englishText = englishSpans[i].textContent.trim();
-        if (currentEnglishText.includes(englishText) || englishText.includes(currentEnglishText)) {
+        const spanText = englishSpans[i].textContent.trim();
+        if (englishText.includes(spanText) || spanText.includes(englishText)) {
           matchedIndex = i;
           matchedDataStart = englishSpans[i].getAttribute('data-start');
+          console.log('⚠️ 部分匹配:', spanText, 'index:', i, 'data-start:', matchedDataStart);
           break;
         }
       }
     }
 
     if (matchedIndex === -1) {
-      console.log('未找到匹配的英文字幕:', currentEnglishText);
+      console.log('❌ 未找到匹配的英文字幕:', englishText);
+      console.log('可用的英文字幕:', Array.from(englishSpans).map(s => s.textContent.trim()));
       return;
     }
 
     // 步骤2: 在沉浸式翻译生成的 font 结构中查找对应的中文翻译
     const translationWrapper = transcriptBody.querySelector('font.immersive-translate-target-wrapper');
     if (!translationWrapper) {
-      console.log('未找到沉浸式翻译内容，请确保沉浸式翻译插件已启用');
+      console.log('❌ 未找到沉浸式翻译内容，请确保沉浸式翻译插件已启用');
       return;
     }
 
     // 在翻译区域查找所有带 data-start 属性的 span
     const translatedSpans = translationWrapper.querySelectorAll('span[data-start]');
+    console.log('🈲 找到的中文翻译数量:', translatedSpans.length);
 
     let translatedText = '';
 
-    // 方法1: 通过 data-start 属性精确匹配
+    // 方法1: 通过 data-start 属性精确匹配（最准确）
     if (matchedDataStart) {
       for (const span of translatedSpans) {
         if (span.getAttribute('data-start') === matchedDataStart) {
           translatedText = span.textContent.trim();
+          console.log('✅ 通过 data-start 匹配到翻译:', translatedText);
           break;
         }
       }
@@ -186,6 +219,7 @@
     // 方法2: 如果方法1失败，使用索引匹配
     if (!translatedText && translatedSpans[matchedIndex]) {
       translatedText = translatedSpans[matchedIndex].textContent.trim();
+      console.log('⚠️ 通过索引匹配到翻译:', translatedText);
     }
 
     // 方法3: 如果还是没有，尝试查找包含中文的 span
@@ -194,6 +228,7 @@
         const text = span.textContent.trim();
         if (/[\u4e00-\u9fa5]/.test(text)) {
           translatedText = text;
+          console.log('⚠️ 通过中文检测匹配到翻译:', translatedText);
           break;
         }
       }
@@ -202,48 +237,76 @@
     // 显示翻译后的字幕
     if (translatedText) {
       displayTranslatedSubtitle(translatedText);
-      console.log('✅ 字幕映射:', currentEnglishText, '->', translatedText);
+      console.log('🎯 最终字幕映射:', englishText, '->', translatedText);
     } else {
-      console.log('未找到对应的中文翻译');
+      console.log('❌ 未找到对应的中文翻译');
+      console.log('所有可用的中文翻译:', Array.from(translatedSpans).map(s => s.textContent.trim()));
     }
   }
 
   // 创建用于显示翻译字幕的元素
   function createTranslatedSubtitleElement() {
-    if (translatedSubtitleElement) return;
-
     const captionWindow = document.querySelector('.caption-window');
     if (!captionWindow) {
       console.log('未找到 .caption-window 元素');
       return;
     }
 
-    translatedSubtitleElement = document.createElement('div');
-    translatedSubtitleElement.id = 'packt-translated-subtitle';
-    translatedSubtitleElement.style.cssText = `
-      color: #FFD700 !important;
-      background-color: rgba(0, 0, 0, 0.8) !important;
-      padding: 8px 12px !important;
-      margin-top: 6px !important;
-      font-size: 100% !important;
-      border-radius: 4px !important;
-      font-weight: 600 !important;
-      text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.9) !important;
-      line-height: 1.4 !important;
-      letter-spacing: 0px !important;
-      display: none !important;
+    // 检查是否已经创建了翻译字幕容器
+    if (document.querySelector('.packt-translated-subtitle-container')) {
+      return;
+    }
+
+    // 创建一个独立的翻译字幕容器，放在原生字幕的正下方
+    const translatedContainer = document.createElement('div');
+    translatedContainer.className = 'packt-translated-subtitle-container';
+    translatedContainer.style.cssText = `
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      width: 100%;
+      text-align: center;
+      pointer-events: none;
+      z-index: 1000;
     `;
 
-    captionWindow.appendChild(translatedSubtitleElement);
-    console.log('✅ 翻译字幕显示元素已创建');
+    // 创建翻译字幕元素
+    const translatedSubtitle = document.createElement('div');
+    translatedSubtitle.className = 'packt-translated-subtitle';
+    translatedSubtitle.style.cssText = `
+      display: none;
+      background-color: rgba(0, 0, 0, 0.8);
+      color: white;
+      padding: 4px 8px;
+      font-size: 18px;
+      line-height: 1.4;
+      text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.8);
+      border-radius: 2px;
+      margin: 0 auto;
+      max-width: 90%;
+      word-wrap: break-word;
+    `;
+
+    translatedContainer.appendChild(translatedSubtitle);
+    captionWindow.appendChild(translatedContainer);
+
+    console.log('✅ 翻译字幕容器已创建');
   }
 
   // 显示翻译后的字幕
   function displayTranslatedSubtitle(text) {
-    if (!translatedSubtitleElement || !text) return;
+    if (!text) return;
 
-    translatedSubtitleElement.textContent = text;
-    translatedSubtitleElement.style.display = text ? 'block' : 'none';
+    const translatedSubtitle = document.querySelector('.packt-translated-subtitle');
+    if (!translatedSubtitle) {
+      console.log('未找到翻译字幕容器');
+      return;
+    }
+
+    // 直接更新翻译字幕内容
+    translatedSubtitle.textContent = text;
+    translatedSubtitle.style.display = 'inline-block';
 
     console.log('📝 显示翻译字幕:', text);
   }
@@ -278,8 +341,12 @@
       settings.enabled = isEnabled;
       await StorageManager.saveSettings(settings);
 
-      if (!isEnabled && translatedSubtitleElement) {
-        translatedSubtitleElement.style.display = 'none';
+      if (!isEnabled) {
+        // 隐藏翻译字幕
+        const translatedSubtitle = document.querySelector('.packt-translated-subtitle');
+        if (translatedSubtitle) {
+          translatedSubtitle.style.display = 'none';
+        }
       } else {
         findAndDisplayCurrentSubtitle();
       }
