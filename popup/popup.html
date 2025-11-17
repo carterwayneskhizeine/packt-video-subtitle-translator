@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>字幕翻译设置</title>
+  <link rel="stylesheet" href="popup.css">
+</head>
+<body>
+  <div class="container">
+    <header>
+      <h1>📺 Packt 字幕同步器</h1>
+      <p class="subtitle">实时同步字幕区域的翻译到视频画面</p>
+    </header>
+
+    <main>
+      <!-- 启用/禁用开关 -->
+      <div class="setting-group">
+        <label class="toggle-label">
+          <span>启用字幕同步</span>
+          <div class="toggle-switch">
+            <input type="checkbox" id="enableToggle" checked>
+            <span class="slider"></span>
+          </div>
+        </label>
+        <p class="hint">关闭后可临时禁用同步功能</p>
+      </div>
+
+      <!-- 操作按钮 -->
+      <div class="actions" style="margin-top: 30px;">
+        <button id="saveBtn" class="btn btn-primary">💾 保存设置</button>
+      </div>
+
+      <!-- 状态消息 -->
+      <div id="status" class="status hidden"></div>
+
+      <!-- 使用说明 -->
+      <div class="help">
+        <details>
+          <summary>📖 使用说明</summary>
+          <div class="help-content">
+            <h3>前提条件</h3>
+            <p>需要先安装并启用 <strong>沉浸式翻译</strong> 插件</p>
+
+            <h3>使用方法</h3>
+            <ol>
+              <li>确保沉浸式翻译插件已启用并配置好翻译</li>
+              <li>访问 Packt 订阅视频页面</li>
+              <li>播放视频，字幕区域的翻译将自动同步到视频画面</li>
+              <li>可使用视频控制栏的开关按钮临时关闭同步</li>
+            </ol>
+
+            <h3>工作原理</h3>
+            <p>本插件复用沉浸式翻译插件已经翻译好的字幕内容，避免了重复翻译的延迟，实现即时同步显示。</p>
+          </div>
+        </details>
+      </div>
+    </main>
+
+    <footer>
+      <p>版本 1.0.0 | <a href="https://github.com" target="_blank">GitHub</a></p>
+    </footer>
+  </div>
+
+  <script src="popup.js"></script>
+</body>
+</html>

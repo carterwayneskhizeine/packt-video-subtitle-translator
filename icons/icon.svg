@@ -1,0 +1,25 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="128" height="128" viewBox="0 0 128 128">
+  <defs>
+    <linearGradient id="grad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#667eea;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#764ba2;stop-opacity:1" />
+    </linearGradient>
+  </defs>
+
+  <!-- Background -->
+  <rect width="128" height="128" rx="24" fill="url(#grad)"/>
+
+  <!-- Subtitle symbol (bars representing text lines) -->
+  <rect x="20" y="75" width="88" height="8" rx="2" fill="white" opacity="0.9"/>
+  <rect x="30" y="90" width="68" height="8" rx="2" fill="white" opacity="0.9"/>
+
+  <!-- Translation arrow/symbol -->
+  <g transform="translate(64, 40)">
+    <!-- Chinese character-like symbol -->
+    <text x="-18" y="0" font-family="Arial" font-size="28" font-weight="bold" fill="white">中</text>
+    <text x="0" y="0" font-family="Arial" font-size="20" fill="white" opacity="0.8">EN</text>
+  </g>
+
+  <!-- Play button symbol -->
+  <polygon points="35,25 35,55 60,40" fill="white" opacity="0.3"/>
+</svg>

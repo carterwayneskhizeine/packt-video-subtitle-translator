@@ -1,0 +1,35 @@
+{
+  "manifest_version": 3,
+  "name": "Packt 视频字幕实时同步器",
+  "version": "1.1.0",
+  "description": "将 Packt 字幕区域的翻译实时同步到视频字幕显示区域（需配合沉浸式翻译插件使用）",
+  "permissions": [
+    "storage",
+    "activeTab"
+  ],
+  "host_permissions": [
+    "https://subscription.packtpub.com/*"
+  ],
+  "action": {
+    "default_popup": "popup/popup.html",
+    "default_icon": {
+      "16": "icons/icon16.png",
+      "32": "icons/icon32.png",
+      "48": "icons/icon48.png",
+      "128": "icons/icon128.png"
+    }
+  },
+  "content_scripts": [
+    {
+      "matches": ["https://subscription.packtpub.com/video/*"],
+      "js": ["utils/storage.js", "content/content.js"],
+      "run_at": "document_idle"
+    }
+  ],
+  "icons": {
+    "16": "icons/icon16.png",
+    "32": "icons/icon32.png",
+    "48": "icons/icon48.png",
+    "128": "icons/icon128.png"
+  }
+}
