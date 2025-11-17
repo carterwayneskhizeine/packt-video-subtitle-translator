@@ -3,8 +3,8 @@
 document.addEventListener('DOMContentLoaded', async () => {
   // 获取元素
   const enableToggle = document.getElementById('enableToggle');
-  const saveBtn = document.getElementById('saveBtn');
   const statusDiv = document.getElementById('status');
+  const githubLink = document.getElementById('githubLink');
 
   // 加载设置
   const settings = await loadSettings();
@@ -12,18 +12,24 @@ document.addEventListener('DOMContentLoaded', async () => {
   // 填充表单
   enableToggle.checked = settings.enabled;
 
-  // 保存设置
-  saveBtn.addEventListener('click', async () => {
+  // 开关状态变化时直接保存
+  enableToggle.addEventListener('change', async () => {
     const newSettings = {
       enabled: enableToggle.checked
     };
 
     try {
       await chrome.storage.sync.set({ settings: newSettings });
-      showStatus('✅ 设置已保存！', 'success');
+      showStatus('✅ Saved!', 'success');
     } catch (error) {
-      showStatus('❌ 保存失败: ' + error.message, 'error');
+      showStatus('❌ Save failed: ' + error.message, 'error');
     }
+  });
+
+  // GitHub链接点击事件
+  githubLink.addEventListener('click', (e) => {
+    // 可以在这里添加分析代码或其他逻辑
+    // 目前直接跳转，已经在HTML中设置了target="_blank"
   });
 });
 
@@ -43,8 +49,8 @@ function showStatus(message, type = 'success') {
   statusDiv.textContent = message;
   statusDiv.className = `status ${type}`;
 
-  // 3秒后自动隐藏
+  // 2秒后自动隐藏
   setTimeout(() => {
     statusDiv.className = 'status hidden';
-  }, 3000);
+  }, 2000);
 }

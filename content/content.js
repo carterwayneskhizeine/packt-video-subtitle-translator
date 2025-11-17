@@ -262,7 +262,7 @@
     translatedContainer.className = 'packt-translated-subtitle-container';
     translatedContainer.style.cssText = `
       position: absolute;
-      bottom: 0;
+      bottom: 25px;
       left: 0;
       right: 0;
       width: 100%;

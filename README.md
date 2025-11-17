@@ -39,7 +39,7 @@
    ```
 
 2. **准备图标文件**（可选）
-   - 参考 `icons/README.md` 生成 PNG 图标
+   - 图标文件已包含在 `icons/` 目录中
    - 或者暂时注释掉 `manifest.json` 中的 icons 配置
 
 3. **加载插件到 Chrome**
@@ -84,7 +84,7 @@
 
 **注意**：如果提示缺少图标，可以：
 - 忽略警告（不影响功能）
-- 或者参考 `icons/README.md` 生成图标
+- 图标文件已包含在 `icons/` 目录中
 
 ### 第四步：测试功能（1 分钟）
 
@@ -119,13 +119,17 @@ chrome-subtitle-translator/
 ├── content/                   # 内容脚本
 │   └── content.js            # 字幕同步核心逻辑
 ├── utils/                     # 工具模块
-│   └── storage.js            # 存储管理（仅保留基础设置）
+│   ├── storage.js            # 存储管理
+│   └── translator.js         # 翻译工具
 ├── icons/                     # 图标资源
 │   ├── icon.svg              # SVG 源图标
-│   └── README.md             # 图标生成说明
-├── CHANGELOG.md              # 版本更新记录
-├── README.md                 # 项目文档
-└── INSTALL.md               # 安装配置指南
+│   ├── icon16.png            # 16x16 图标
+│   ├── icon32.png            # 32x32 图标
+│   ├── icon48.png            # 48x48 图标
+│   └── icon128.png           # 128x128 图标
+├── background/                # 后台脚本目录
+├── debug-console.js          # 调试控制台脚本
+└── README.md                 # 项目文档
 ```
 
 ## ⚙️ 技术实现
@@ -282,16 +286,16 @@ displayTranslatedSubtitle(translatedText);
 - 从 GitHub 下载 ZIP 并解压
 - 或者使用 Git 克隆：`git clone <repo-url>`
 
-#### 步骤 3: 生成图标文件（可选）
+#### 步骤 3: 确认图标文件
 
-**方法 A：使用在线工具（推荐）**
-1. 打开 https://www.aconvert.com/image/svg-to-png/
-2. 上传 `icons/icon.svg`
-3. 分别导出 16x16、32x32、48x48、128x128 四种尺寸
-4. 重命名为 `icon16.png`、`icon32.png`、`icon48.png`、`icon128.png`
-5. 保存到 `icons/` 目录
+图标文件已经包含在 `icons/` 目录中：
+- ✅ `icon.svg` - SVG 源文件
+- ✅ `icon16.png` - 16x16 像素图标
+- ✅ `icon32.png` - 32x32 像素图标
+- ✅ `icon48.png` - 48x48 像素图标
+- ✅ `icon128.png` - 128x128 像素图标
 
-**方法 B：跳过图标（测试用）**
+**方法 A：跳过图标（如果不想使用图标）**
 1. 打开 `manifest.json`
 2. 临时注释掉所有 `icons` 相关配置
 3. 保存文件
@@ -377,7 +381,7 @@ A: 点击视频控制栏的"字幕映射: 开/关"按钮即可
 
 ## 🔄 版本历史
 
-### [1.1.0] - 2025-01-17（当前版本）
+### [1.1.0] - 2025-11-17（当前版本）
 
 #### 重大变更 🔄
 
@@ -409,11 +413,13 @@ A: 点击视频控制栏的"字幕映射: 开/关"按钮即可
 #### 技术细节
 
 **修改的文件**:
-- `content/content.js`: 重写字幕查找和匹配逻辑
+- `content/content.js`: 重写字幕查找和匹配逻辑，调整字幕位置
 - `popup/popup.html`: 简化设置界面，移除 API 配置
 - `popup/popup.js`: 移除 API 相关代码
 - `utils/storage.js`: 简化存储结构
+- `utils/translator.js`: 保留翻译工具类
 - `manifest.json`: 更新描述和版本号
+- `background/`: 添加后台脚本支持
 
 #### 已知问题
 
@@ -425,7 +431,7 @@ A: 点击视频控制栏的"字幕映射: 开/关"按钮即可
    - 依赖 `data-start` 属性进行精确匹配
    - 如果沉浸式翻译修改了属性，可能需要调整代码
 
-### [1.0.0] - 2025-01-17
+### [1.0.0] - 2025-11-16
 
 **首次发布 🎉**
 
@@ -448,8 +454,8 @@ A: 点击视频控制栏的"字幕映射: 开/关"按钮即可
 
 #### 文档
 - 完整的 README.md
-- 详细的安装指南 INSTALL.md
-- 图标生成说明
+- 调试控制台脚本 debug-console.js
+- 图标资源文件（SVG 和 PNG 格式）
 
 **注意**：1.1.0 版本已移除上述所有 API 依赖功能
 
