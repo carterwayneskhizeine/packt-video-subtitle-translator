@@ -2,7 +2,7 @@
   "manifest_version": 3,
   "name": "Packt Video Subtitle Real-time Synchronizer",
   "version": "1.1.0",
-  "description": "Synchronize the translation of Packt subtitle area in real-time to the video subtitle display area (requires the use of the Immersive Translation extension).",
+  "description": "Synchronize Packt subtitle translations in real-time to the video display area (requires Immersive Translation extension).",
   "permissions": [
     "storage",
     "activeTab"
