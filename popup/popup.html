@@ -32,6 +32,27 @@
       </div>
 
       <!-- 状态消息 -->
+      <!-- 字幕垂直偏移 -->
+      <div class="setting-group">
+        <label class="slider-label">
+          <span>Vertical Offset (px)</span>
+          <div class="range-container">
+            <input type="range" id="offsetSlider" min="-50" max="50" step="1" value="0">
+            <span class="range-value" id="offsetValue">0</span>
+          </div>
+        </label>
+      </div>
+
+      <!-- 字幕字体大小 -->
+      <div class="setting-group">
+        <label class="slider-label">
+          <span>Font Size (px)</span>
+          <div class="range-container">
+            <input type="range" id="fontSizeSlider" min="10" max="40" step="1" value="16">
+            <span class="range-value" id="fontSizeValue">16</span>
+          </div>
+        </label>
+      </div>
       <div id="status" class="status hidden"></div>
     </main>
   </div>

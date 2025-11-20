@@ -30,6 +30,7 @@
     ]).then(() => {
       console.log('✅ 视频字幕和翻译区域已加载');
       createTranslatedSubtitleElement();
+      applySubtitleStyles();
       startCaptionTextTracking();
       startTranscriptTracking();
     });
@@ -279,7 +280,7 @@
       background-color: rgba(0, 0, 0, 0.8);
       color: white;
       padding: 4px 8px;
-      font-size: 18px;
+      font-size: 16px;
       line-height: 1.4;
       text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.8);
       border-radius: 2px;
@@ -309,6 +310,21 @@
     translatedSubtitle.style.display = 'inline-block';
 
     console.log('📝 显示翻译字幕:', text);
+  }
+  
+  // 应用字幕样式（字体大小和垂直偏移）
+  function applySubtitleStyles() {
+    const translatedSubtitle = document.querySelector('.packt-translated-subtitle');
+    const translatedContainer = document.querySelector('.packt-translated-subtitle-container');
+    if (!translatedSubtitle || !translatedContainer || !settings) return;
+  
+    // 应用字体大小
+    translatedSubtitle.style.fontSize = `${settings.subtitleFontSize}px`;
+  
+    // 应用垂直偏移（调整容器 bottom 值）
+    const baseBottom = 25;
+    const adjustedBottom = baseBottom + settings.subtitleOffset;
+    translatedContainer.style.bottom = `${adjustedBottom}px`;
   }
 
   // 添加控制按钮
@@ -368,6 +384,7 @@
         button.style.background = isEnabled ? '#4CAF50' : '#f44336';
       }
 
+      applySubtitleStyles();
       console.log('设置已更新:', settings);
     }
   });

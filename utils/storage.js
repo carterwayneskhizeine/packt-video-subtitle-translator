@@ -3,7 +3,9 @@ const StorageManager = {
   // 获取设置
   async getSettings() {
     const defaultSettings = {
-      enabled: true
+      enabled: true,
+      subtitleOffset: 0,
+      subtitleFontSize: 16
     };
 
     const result = await chrome.storage.sync.get('settings');
