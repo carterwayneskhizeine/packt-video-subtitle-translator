@@ -327,32 +327,46 @@
     translatedContainer.style.bottom = `${adjustedBottom}px`;
   }
 
-  // 添加控制按钮
+  // 添加控制滑块
   function addControlButton() {
     const controls = document.querySelector('.controls');
     if (!controls) return;
 
-    const button = document.createElement('button');
-    button.id = 'subtitle-translator-toggle';
-    button.style.cssText = `
-      background: ${isEnabled ? '#4CAF50' : '#f44336'};
-      color: white;
-      border: none;
-      padding: 6px 12px;
-      margin-left: 8px;
-      border-radius: 4px;
+    const toggle = document.createElement('div');
+    toggle.id = 'subtitle-translator-toggle';
+    toggle.style.cssText = `
+      width: 32px;
+      height: 12px;
+      background: ${isEnabled ? '#ec6611' : '#ccc'};
+      border-radius: 6px;
       cursor: pointer;
-      font-size: 12px;
-      font-weight: 500;
-      transition: all 0.3s ease;
+      position: relative;
+      margin-left: 4px;
+      transition: background-color 0.3s ease;
+      display: inline-block;
+      vertical-align: middle;
     `;
-    button.textContent = isEnabled ? '字幕映射: 开' : '字幕映射: 关';
-    button.title = '切换字幕映射（复用沉浸式翻译结果）';
+    const thumb = document.createElement('div');
+    thumb.style.cssText = `
+      width: 18px;
+      height: 18px;
+      background: #fff;
+      border-radius: 50%;
+      position: absolute;
+      top: -3px;
+      left: ${isEnabled ? '14px' : '0px'};
+      transition: left 0.3s ease;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+    `;
 
-    button.addEventListener('click', async () => {
+    toggle.title = 'Toggle Subtitle Mapping (Reuse Immersive Translation Results)';
+
+    toggle.appendChild(thumb);
+
+    toggle.addEventListener('click', async () => {
       isEnabled = !isEnabled;
-      button.textContent = isEnabled ? '字幕映射: 开' : '字幕映射: 关';
-      button.style.background = isEnabled ? '#4CAF50' : '#f44336';
+      toggle.style.backgroundColor = isEnabled ? '#ec6611' : '#ccc';
+      thumb.style.left = isEnabled ? '14px' : '0px';
 
       settings.enabled = isEnabled;
       await StorageManager.saveSettings(settings);
@@ -368,8 +382,8 @@
       }
     });
 
-    controls.appendChild(button);
-    console.log('🎛️ 控制按钮已添加');
+    controls.appendChild(toggle);
+    console.log('🎛️ 控制滑块已添加');
   }
 
   // 监听设置变化
@@ -378,10 +392,13 @@
       settings = changes.settings.newValue;
       isEnabled = settings.enabled;
 
-      const button = document.getElementById('subtitle-translator-toggle');
-      if (button) {
-        button.textContent = isEnabled ? '字幕映射: 开' : '字幕映射: 关';
-        button.style.background = isEnabled ? '#4CAF50' : '#f44336';
+      const toggle = document.getElementById('subtitle-translator-toggle');
+      if (toggle) {
+        const thumb = toggle.children[0];
+        toggle.style.backgroundColor = isEnabled ? '#ec6611' : '#ccc';
+        if (thumb) {
+          thumb.style.left = isEnabled ? '14px' : '0px';
+        }
       }
 
       applySubtitleStyles();
