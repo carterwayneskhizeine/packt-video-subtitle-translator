@@ -5,6 +5,8 @@
 ![Version](https://img.shields.io/badge/version-1.1.0-blue)
 ![License](https://img.shields.io/badge/license-MIT-green)
 
+🔗 **Chrome 插件商店**: [安装插件](https://chromewebstore.google.com/detail/mjldodlagafglpffckeeihoniblomobl?utm_source=item-share-cb)
+
 ## ✨ 功能特点
 
 - 🔄 **即时同步** - 零延迟，实时同步沉浸式翻译结果到视频画面
